@@ -1,4 +1,4 @@
-/* .settings-container {
+.settings-container {
     width: 300px;
     margin: 50px auto;
     padding: 25px;
@@ -7,7 +7,7 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     text-align: left;
     font-family: 'Helvetica Neue', sans-serif;
-} */
+}
 .settings-container h3 {
     text-align: left;
     margin-bottom: 15px;

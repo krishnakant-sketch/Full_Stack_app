@@ -20,6 +20,7 @@ const UserSchema = new mongoose.Schema({
   username: String,
   email: String,
   password: String,
+  profileImage: String,
 });
 const User = mongoose.model("User", UserSchema);
 
@@ -64,5 +65,40 @@ function authMiddleware(req, res, next) {
 app.get("/dashboard", authMiddleware, (req, res) => {
   res.json({ message: `Welcome user ${req.user.id}` });
 });
+
+// Upload or update profile image
+app.post("/profile", async (req, res) => {
+  const { image } = req.body; // Base64 string or URL
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { profileImage: image },
+      { new: true }
+    );
+    res.json({ message: "Profile image updated", profileImage: user.profileImage });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update profile image" });
+  }
+});
+
+
+// app.get("/profile", async (req, res) => {
+//   try {
+//     console.log("Fetching profile for user:", req.user.id);
+//     res.json({ profileImage: "http://localhost:4000/path/to/default/image.jpg" });
+//   } catch (err) {
+//     res.status(500).json({ error: "Failed to fetch profile image" });
+//   }
+// });
+
+app.get("/profile", authMiddleware, async (req, res) => {
+  try {
+    console.log("Fetching profile for user:", req.user.id);
+    res.json({ profileImage: "http://localhost:4000/path/to/default/image.jpg" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch profile image" });
+  }
+});
+
 console.log("Hello")
 app.listen(4000, () => console.log("Server running on port 4000"));
