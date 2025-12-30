@@ -1,0 +1,16 @@
+.About-container {
+    padding: 20px;
+    background-color: #c3baba;
+    border-radius: 10px;
+    box-shadow: 0 10px 4px rgba(0, 0, 0, 0.1);
+}
+
+.About-container h4{
+    color: black;
+    margin-top: 10px;
+}
+
+.About-container p{
+    color: black;
+    font-size: 26px;
+}

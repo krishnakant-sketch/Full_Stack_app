@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Link,
+  Route,
+  Router,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
+import Home from "./Components/Home";
+import Profile from "./Components/Profile";
+import About from "./Components/About";
+import Settings from "./Components/Settings";
+
+import { Outlet } from "react-router-dom";
 
 function Dashboard() {
   const [message, setMessage] = useState("");
@@ -30,8 +43,13 @@ function Dashboard() {
   };
 
   return (
-    <div>
-      <h2>Dashboard</h2>
+    <div className="dashboard-container">
+      <h3>Welcome to the Dashboard</h3>
+      <Link to="/home">Home</Link> | {" "}
+      <Link to="/profile">Profile</Link> | {" "}
+      <Link to="/about">About</Link> | {" "}
+      <Link to="/settings">Settings</Link>
+
       <p>{message}</p>
       <button onClick={logout}>Logout</button>
     </div>
