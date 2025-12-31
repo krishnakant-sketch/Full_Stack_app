@@ -6,14 +6,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-
-
-mongoose.connect(
-  "mongodb+srv://krishnakant_db_user:Krishna%4010@cluster0.ttpqlds.mongodb.net/mernAuth?retryWrites=true&w=majority"
-)
-.then(() => console.log("MongoDB connected"))
-.catch(err => console.error("MongoDB connection error:", err));
-
+mongoose
+  .connect(
+    "mongodb+srv://krishnakant_db_user:Krishna%4010@cluster0.ttpqlds.mongodb.net/mernAuth?retryWrites=true&w=majority"
+  )
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // User model
 const UserSchema = new mongoose.Schema({
@@ -66,21 +64,42 @@ app.get("/dashboard", authMiddleware, (req, res) => {
   res.json({ message: `Welcome user ${req.user.id}` });
 });
 
+app.use(
+  cors()
+);
 // Upload or update profile image
-app.post("/profile", async (req, res) => {
-  const { image } = req.body; // Base64 string or URL
+// app.post("/profile", async (req, res) => {
+//   const { image } = req.body; // Base64 string or URL
+//   try {
+//     const user = await User.findByIdAndUpdate(
+//       req.user.id,
+//       { profileImage: image },
+//       { new: true }
+//     );
+//     res.json({ message: "Profile image updated", profileImage: user.profileImage });
+//   } catch (err) {
+//     res.status(500).json({ error: "Failed to update profile image" });
+//   }
+// });
+
+const multer = require("multer");
+const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } }); // 5 MB
+
+app.post("/profile", upload.single("image"), async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { profileImage: image },
+      { profileImage: req.file.path }, // store file path or URL
       { new: true }
     );
-    res.json({ message: "Profile image updated", profileImage: user.profileImage });
+    res.json({
+      message: "Profile image updated",
+      profileImage: user.profileImage,
+    });
   } catch (err) {
     res.status(500).json({ error: "Failed to update profile image" });
   }
 });
-
 
 // app.get("/profile", async (req, res) => {
 //   try {
@@ -94,11 +113,13 @@ app.post("/profile", async (req, res) => {
 app.get("/profile", authMiddleware, async (req, res) => {
   try {
     console.log("Fetching profile for user:", req.user.id);
-    res.json({ profileImage: "http://localhost:4000/path/to/default/image.jpg" });
+    res.json({
+      profileImage: "http://localhost:4000/path/to/default/image.jpg",
+    });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch profile image" });
   }
 });
 
-console.log("Hello")
+console.log("Hello");
 app.listen(4000, () => console.log("Server running on port 4000"));

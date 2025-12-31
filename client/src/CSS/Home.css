@@ -1,11 +1,11 @@
-
 .home-container h3 {
-    color: #0a0707;
-    margin-bottom: 10px;
+  background-color: #3498db;
+  transition: background-color 0.5s ease;
+  margin-bottom: 10px;
 }
 
 .home-container p {
-    color: #000000;
-    font-size: 20px;
+  color: #000000;
+  font-size: 20px;
 }
 
