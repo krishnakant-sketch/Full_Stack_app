@@ -1,7 +1,31 @@
 .App {
   text-align: center;
-}
 
+}
+#home {
+    font-size: 16px;
+    color: #307185;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+#profile {
+    font-size: 16px;
+    color: #307185;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+#about {
+    font-size: 16px;
+    color: #307185;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+#settings {
+    font-size: 16px;
+    color: #307185;
+    margin-right: 10px;
+    margin-left: 10px;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;

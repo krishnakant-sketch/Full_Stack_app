@@ -1,8 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
+const { Server } = require("socket.io");
 const app = express();
+const http = require("http");
 app.use(express.json());
 app.use(cors());
 
@@ -64,9 +65,7 @@ app.get("/dashboard", authMiddleware, (req, res) => {
   res.json({ message: `Welcome user ${req.user.id}` });
 });
 
-app.use(
-  cors()
-);
+app.use(cors());
 // Upload or update profile image
 // app.post("/profile", async (req, res) => {
 //   const { image } = req.body; // Base64 string or URL
@@ -121,5 +120,57 @@ app.get("/profile", authMiddleware, async (req, res) => {
   }
 });
 
-console.log("Hello");
+// make sure to install: npm install node-fetch
+
+// app.get("/gold", async (req, res) => {
+//   try {
+//     const response = await fetch("https://www.goldapi.io/api/XAU/INR", {
+//       method: "GET",
+//       headers: {
+//         "x-access-token": "goldapi-abtui9smk0tevn1-io", // your API key
+//         "Content-Type": "application/json",
+//       },
+//     });
+
+//     const data = await response.json();
+//     res.json(data); // send gold rate to frontend
+//   } catch (error) {
+//     console.error("Error fetching gold rate:", error);
+//     res.status(500).json({ error: "Failed to fetch gold rate" });
+//   }
+// });
+
+async function getGoldRate() {
+  const response = await fetch("https://www.goldapi.io/api/XAU/INR", {
+    method: "GET",
+    headers: {
+      "x-access-token": "goldapi-abtui9smk0tevn1-io",
+      "Content-Type": "application/json",
+    },
+  });
+  return await response.json();
+}
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: "*" }, // allow frontend
+});
+
+io.on("connection", (socket) => {
+  console.log("Client connected:", socket.id); // Send updates every 60 seconds const
+  interval = setInterval(async () => {
+    try {
+      const data = await getGoldRate();
+      socket.emit("goldRateUpdate", data);
+    } catch (err) {
+      console.error("Error fetching gold rate:", err);
+    }
+  }, 60000);
+  socket.on("disconnect", () => {
+    clearInterval(interval);
+    console.log("Client disconnected:", socket.id);
+  });
+});
+
+server.listen(5000, () => console.log("WebSocket server running on port 5000"));
+
 app.listen(4000, () => console.log("Server running on port 4000"));

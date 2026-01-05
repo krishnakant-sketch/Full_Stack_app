@@ -13,6 +13,7 @@ import Home from "./Components/Home";
 import Profile from "./Components/Profile";
 import About from "./Components/About";
 import Settings from "./Components/Settings";
+import "./App.css";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -21,7 +22,7 @@ const PrivateRoute = ({ children }) => {
 
 function App() {
   return (
-  
+    <div className="App">
     <Router>
       <Routes>
         <Route path="/register" element={<Register />} />
@@ -34,6 +35,7 @@ function App() {
         
       </Routes>
     </Router>
+    </div>
   );
 }
 

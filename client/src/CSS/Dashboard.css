@@ -1,0 +1,25 @@
+.dashboard-container {
+    height: 100vh;
+    padding: 20px;
+    background-color: #e9e9e6;
+    
+}
+
+.dashboard-container h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.dashboard-container button {
+    background-color: #975229;
+    color: black;
+    align-items: center;
+}
+
+.parent {
+    font-size: 18px;
+    color: #307185;
+    margin-bottom: 15px;
+    
+}
+

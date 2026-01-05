@@ -1,0 +1,40 @@
+.form-container {
+    padding: 20px;
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    max-width: 500px;
+    margin: auto;
+
+}
+
+.form-container label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: rgb(35, 55, 73);
+    align-items: center
+}
+
+.form-container input {
+    width: 50%;
+    margin-bottom: 15px;
+    margin-left: 5px;
+    border: 1px solid #d5a7a7;
+    border-radius: 6px;
+}
+
+.form-container button {
+    background-color: #3887bc;
+    margin-top: 10px;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    
+}
+
+.form-container p {
+    font-size: 18px;
+    color: #091929;
+}
+
