@@ -1,30 +1,34 @@
 .App {
-  text-align: center;
+  /* text-align: center; */
 
 }
 #home {
     font-size: 16px;
-    color: #307185;
+    color: #a8d9e8;
     margin-right: 10px;
     margin-left: 10px;
+    font-weight: bold;
 }
 #profile {
     font-size: 16px;
-    color: #307185;
+    color: #a8d9e8;
     margin-right: 10px;
     margin-left: 10px;
+    font-weight: bold;
 }
 #about {
     font-size: 16px;
-    color: #307185;
+    color: #a8d9e8;
     margin-right: 10px;
     margin-left: 10px;
+    font-weight: bold;
 }
 #settings {
     font-size: 16px;
-    color: #307185;
+    color: #a8d9e8;
     margin-right: 10px;
     margin-left: 10px;
+    font-weight: bold;
 }
 .App-logo {
   height: 40vmin;

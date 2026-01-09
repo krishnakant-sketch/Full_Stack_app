@@ -3,9 +3,18 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { Server } = require("socket.io");
 const app = express();
+const bodyParser = require("body-parser");
 const http = require("http");
+const Razorpay = require("razorpay");
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "*",
+}));
+const Transaction = require("./models/Transaction.js");
+const transactionsRoute = require("./routes/transaction.js");
+
+
+app.use("/webhook/razorpay", bodyParser.raw({ type: "application/json" }));
 
 mongoose
   .connect(
@@ -140,37 +149,153 @@ app.get("/profile", authMiddleware, async (req, res) => {
 //   }
 // });
 
-async function getGoldRate() {
-  const response = await fetch("https://www.goldapi.io/api/XAU/INR", {
-    method: "GET",
-    headers: {
-      "x-access-token": "goldapi-abtui9smk0tevn1-io",
-      "Content-Type": "application/json",
-    },
-  });
-  return await response.json();
-}
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: "*" }, // allow frontend
+// async function getGoldRate() {
+//   const response = await fetch("https://www.goldapi.io/api/XAU/INR", {
+//     method: "GET",
+//     headers: {
+//       "x-access-token": "goldapi-abtui9smk0tevn1-io",
+//       "Content-Type": "application/json",
+//     },
+//   });
+//   return await response.json();
+// }
+// const server = http.createServer(app);
+// const io = new Server(server, {
+//   cors: { origin: "*" }, // allow frontend
+// });
+
+// io.on("connection", (socket) => {
+//   console.log("Client connected:", socket.id); // Send updates every 60 seconds const
+//   interval = setInterval(async () => {
+//     try {
+//       const data = await getGoldRate();
+//       socket.emit("goldRateUpdate", data);
+//     } catch (err) {
+//       console.error("Error fetching gold rate:", err);
+//     }
+//   }, 60000);
+//   socket.on("disconnect", () => {
+//     clearInterval(interval);
+//     console.log("Client disconnected:", socket.id);
+//   });
+// });
+
+const razorpay = new Razorpay({
+  key_id: "key_id",
+  key_secret: "key_secret",
 });
 
-io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id); // Send updates every 60 seconds const
-  interval = setInterval(async () => {
-    try {
-      const data = await getGoldRate();
-      socket.emit("goldRateUpdate", data);
-    } catch (err) {
-      console.error("Error fetching gold rate:", err);
+// Create an order (frontend calls this, then opens Razorpay Checkout)
+app.post("/create-order", async (req, res) => {
+  try {
+    const { amount } = req.body; // amount in paise (e.g., 50000 = ₹500)
+    const order = await razorpay.orders.create({
+      amount,
+      currency: "INR",
+      receipt: `rcpt_${Date.now()}`,
+      payment_capture: 1,
+    });
+
+    // Optionally store a placeholder transaction for tracking
+    await Transaction.create({
+      orderId: order.id,
+      paymentId: null,
+      amount: order.amount,
+      currency: order.currency,
+      status: "created",
+    });
+
+    res.json(order);
+  } catch (err) {
+    console.error("Create order error:", err);
+    res.status(500).json({ error: "Failed to create order" });
+  }
+});
+
+// Razorpay webhook endpoint
+app.post("/webhook/razorpay", async (req, res) => {
+  const razorpayWebhookSecret = "Krishna@8989"; // from Razorpay dashboard
+
+  // Verify signature
+  const signature = req.headers["x-razorpay-signature"];
+  const body = req.body; // raw buffer (bodyParser.raw)
+  const expected = crypto
+    .createHmac("sha256", razorpayWebhookSecret)
+    .update(body)
+    .digest("hex");
+
+  if (signature !== expected) {
+    console.warn("Webhook signature mismatch");
+    return res.status(400).send("Invalid signature");
+  }
+
+  // Parse JSON after verification
+  const event = JSON.parse(body.toString());
+
+  try {
+    // Handle payment captured
+    if (event.event === "payment.captured") {
+      const p = event.payload.payment.entity;
+
+      const tx = await Transaction.findOneAndUpdate(
+        { paymentId: p.id },
+        {
+          paymentId: p.id,
+          orderId: p.order_id,
+          amount: p.amount,
+          currency: p.currency,
+          status: "success",
+          method: p.method,
+          email: p.email,
+          contact: p.contact,
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+
+      io.emit("transactionUpdate", tx);
+      console.log("Payment success:", p.id);
     }
-  }, 60000);
-  socket.on("disconnect", () => {
-    clearInterval(interval);
-    console.log("Client disconnected:", socket.id);
-  });
+
+    // Handle payment failed
+    if (event.event === "payment.failed") {
+      const p = event.payload.payment.entity;
+
+      const tx = await Transaction.findOneAndUpdate(
+        { paymentId: p.id },
+        {
+          paymentId: p.id,
+          orderId: p.order_id,
+          amount: p.amount,
+          currency: p.currency,
+          status: "failed",
+          method: p.method,
+          email: p.email,
+          contact: p.contact,
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+
+      io.emit("transactionUpdate", tx);
+      console.log("Payment failed:", p.id);
+    }
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error("Webhook handling error:", err);
+    res.status(500).send("Webhook processing failed");
+  }
 });
 
-server.listen(5000, () => console.log("WebSocket server running on port 5000"));
+// REST route for initial list
+app.use("/transactions", transactionsRoute);
+
+// Socket.IO connection (optional logs)
+io.on("connection", (socket) => {
+  console.log("Client connected:", socket.id);
+  socket.on("disconnect", () => console.log("Client disconnected:", socket.id));
+});
+
+
+// server.listen(5000, () => console.log("WebSocket server running on port 5000"));
 
 app.listen(4000, () => console.log("Server running on port 4000"));

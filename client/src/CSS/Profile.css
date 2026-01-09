@@ -3,7 +3,46 @@
     text-align: left;
     background-color: #f9f9f9;
 }   
+
+.profile-container {
+    padding: 30px;
+    height: 100vh;
+    border-radius: 10px;
+    background-color: rgb(192, 215, 220);
+}
 .profile-container p{
     color: #333333;
-    font-size: 18px;
+    font-size: 16px;
+}
+
+/* ProfileSection.css */
+.profile-background {
+  background-image: url('../../public/Team_img.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(42, 39, 39);
+  text-align: center;
+  position: relative;
+}
+
+.profile-content {
+  background: rgba(56, 54, 54, 0.5); /* Optional overlay */
+  margin-bottom: 30px;
+  width: 100%;
+  height: 200px;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+}
+
+.profile-content img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+  border: 2px solid white;
 }

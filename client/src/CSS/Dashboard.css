@@ -2,24 +2,40 @@
     height: 100vh;
     padding: 20px;
     background-color: #e9e9e6;
+    background-image: url("../../public/Tree.png");
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    box-shadow: 0 10px 6px rgba(0, 0, 0, 0.1);
     
 }
 
 .dashboard-container h3 {
-    color: #2c3e50;
+    color: #8cb4dc;
     margin-bottom: 15px;
+    margin-left: 35%;
+}
+
+.dashboard-container h4 {
+    color: #8cb4dc;
+    margin-bottom: 15px;
+    margin-left: 35%;
 }
 
 .dashboard-container button {
     background-color: #975229;
     color: black;
     align-items: center;
+    margin-left: 35%;
 }
 
 .parent {
     font-size: 18px;
-    color: #307185;
+    color: #aee5ac;
     margin-bottom: 15px;
+    margin-left: 35%;
     
 }
+
 

@@ -9,39 +9,21 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { jsPDF } from "jspdf";
-import Home from "./Components/Home";
+
 import Profile from "./Components/Profile";
 import About from "./Components/About";
 import Settings from "./Components/Settings";
 import Form from "./Components/Form";
 import "./CSS/Dashboard.css";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { Outlet } from "react-router-dom";
+import Payment from "./Features/Payment";
+import TaskManager from "./Components/Taskmanager";
 
 function Dashboard() {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-
   const [goldRate, setGoldRate] = useState(null);
-  useEffect(() => {
-    fetch("https://www.goldapi.io/api/XAU/INR", {
-      headers: {
-        "x-access-token": "goldapi-abtui9smk0tevn1-io",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => setGoldRate(data))
-      .catch((err) => console.error(err));
-  }, []);
-
-  // useEffect(() => {
-  //   const socket = io("http://localhost:5000");
-  //   socket.on("goldRateUpdate", (data) => {
-  //     setGoldRate(data);
-  //   });
-  //   return () => socket.disconnect();
-  // }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -60,15 +42,6 @@ function Dashboard() {
         });
     }
   }, [navigate]);
-
-  const Prom = () => {
-    const prom = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve("Promise resolved");
-      }, 1000);
-    });
-    prom.then((resp) => console.log(resp));
-  };
 
   const downloadPDF = () => {
     const doc = new jsPDF();
@@ -91,8 +64,7 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <h3>Welcome to the Dashboard</h3>
-      <Link id="home" to="/home">
+      <Link id="home" to="/dashboard">
         Home
       </Link>{" "}
       |{" "}
@@ -107,6 +79,7 @@ function Dashboard() {
       <Link id="settings" to="/settings">
         Settings
       </Link>
+      <h3>Welcome to the Dashboard</h3>
       <h4>Thanks for choosing us for your Investment Planning</h4>
       <p className="parent"> Please fill out the form below to get started:</p>
       <Form />
@@ -118,7 +91,7 @@ function Dashboard() {
           ? `Current Gold Rate: ₹${goldRate.price_gram_24k}`
           : "Loading..."}
       </h4>
-      {/* <button style={{ marginLeft: "5px"}} onClick={Prom}>Test Promise</button> */}
+      <Payment />
       <button style={{ marginLeft: "30%" }} onClick={logout}>
         Logout
       </button>

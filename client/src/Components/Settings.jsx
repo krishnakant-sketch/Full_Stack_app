@@ -4,16 +4,19 @@ import Dashboard from "../Dashboard";
 import { Link, Route, Router, Routes } from "react-router-dom";
 
 function Settings() {
+
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+
+  
   return (
     <div className="settings-container">
       <h3>Settings</h3>
-      <p>This is the settings section.</p>
-        <nav>
-            <Link to="/dashboard">Dashboard</Link> | {" "}
-        </nav>
+      <h4>Manage your application settings here.</h4>
       
-
-      <a href="/dashboard">Go to Dashboard</a>
+      <nav>
+            <Link to="/dashboard">Dashboard</Link> 
+        </nav>
     </div>
   );
 }
